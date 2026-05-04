@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { User, CreditCard, Bell, LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { initialsFromName } from "@/utils/profile";
 
 async function handleSignOut() {
   if (typeof window !== "undefined") {
@@ -32,6 +33,11 @@ export function NavUser() {
   const { data: session } = useSession();
 
   const user = session?.user;
+  const roleLabel = user?.role?.trim() || "—";
+  const initials =
+    initialsFromName(
+      (user?.name?.trim() || user?.email?.trim() || "?").replace(/\s+/g, " ")
+    ) || "?";
 
   return (
     <SidebarMenu>
@@ -44,12 +50,12 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user?.avatar ?? ""} alt={user?.name ?? ""} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-bold text-slate-900">{user?.name}</span>
                 <span className="truncate text-[10px] font-medium text-slate-400">
-                  Directeur
+                  {roleLabel}
                 </span>
               </div>
               <LogOut className="ml-auto size-4 text-slate-400" />
@@ -68,7 +74,7 @@ export function NavUser() {
                     src={user?.avatar ?? ""}
                     alt={user?.name ?? ""}
                   />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user?.name}</span>

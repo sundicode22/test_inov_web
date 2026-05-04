@@ -98,9 +98,11 @@ export function LoginForm({
                   />
                   Powered by AI · V2.4
                 </p>
-                <h2 className="text-balance text-xl font-bold leading-[1.15] tracking-tight text-white lg:text-2xl">
+                <h2 className="text-balance text-xl flex flex-wrap font-bold leading-[1.15] tracking-tight text-white lg:text-2xl">
                   Votre assistant intelligent pour diriger{" "}
-                  <span className="text-cyan-400/80">sans friction</span>
+                  <span className="bg-gradient-to-b from-white to-blue-400 bg-clip-text text-transparent">
+                    sans friction
+                  </span>{" "}
                 </h2>
                 <p className="text-pretty text-xs leading-relaxed text-slate-400">
                   Gestion d&apos;agenda, échanges conversationnels et
@@ -207,7 +209,7 @@ export function LoginForm({
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-11 text-sm font-bold bg-black hover:bg-black/90 flex items-center gap-2"
+                  className="w-full h-11 text-sm font-bold bg-black hover:bg-black/90 shadow-lg shadow-primary/30 flex items-center gap-2"
                   disabled={isLoading}
                 >
                   {isLoading ? "Connexion..." : "Se connecter"}{" "}
