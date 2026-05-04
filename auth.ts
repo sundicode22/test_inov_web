@@ -1,12 +1,12 @@
-import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
-import Credentials from "next-auth/providers/credentials"
-import { api } from "@/lib/api"
-import { apiClient } from "@/lib/api-client"
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { api } from "@/lib/api";
+import { apiClient } from "@/lib/api-client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   providers: [
-    GitHub,
     Credentials({
       name: "Credentials",
       credentials: {
@@ -14,58 +14,68 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
-        
+        if (!credentials?.email || !credentials?.password) return null;
+
         try {
           const authData = await api.auth.login({
             email: credentials.email as string,
             password: credentials.password as string,
-          })
-          
+          });
+
+          console.log("AUTH DATA", authData);
+
           if (authData && authData.access_token) {
             // Set token for the profile fetch
-            apiClient.defaults.headers.common.Authorization = `Bearer ${authData.access_token}`
-            
-            const profile = await api.user.me()
-            
+            apiClient.defaults.headers.common.Authorization = `Bearer ${authData.access_token}`;
+
+            const profile = await api.user.me();
+
             return {
               id: profile.id,
               email: profile.email,
               name: `${profile.prenom} ${profile.nom}`,
               role: profile.role,
               accessToken: authData.access_token,
-            }
+            };
           }
-          return null
+          return null;
         } catch (error) {
-          console.error("Login error:", error)
-          return null
+          console.error("Login error:", error);
+          return null;
         }
       },
     }),
   ],
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard")
-      if (isOnDashboard) {
-        if (isLoggedIn) return true
-        return false
-      }
-      return true
-    },
+    // authorized({ auth, request: { nextUrl } }) {
+    //   const isLoggedIn = !!auth?.user;
+    //   const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+    //   if (isOnDashboard) {
+    //     if (isLoggedIn) return true;
+    //     return false;
+    //   }
+    //   return true;
+    // },
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken
+        token.id = user.id;
+        token.role = user.role;
+        token.accessToken = user.accessToken;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken
-      return session
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.accessToken = token.accessToken as string;
+      }
+      session.accessToken = token.accessToken as string;
+      return session;
     },
   },
-})
+});

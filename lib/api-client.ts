@@ -1,21 +1,34 @@
 import axios from "axios"
+import { getSession } from "next-auth/react"
 
-const baseURL = "https://ai.test.manage.inov-consulting.com/"
+export const API_BASE_URL = "https://ai.test.manage.inov-consulting.com/"
 
 export const apiClient = axios.create({
-  baseURL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 })
 
-// Interceptor to add the token to requests if it exists in localStorage or session
-apiClient.interceptors.request.use((config) => {
+// Interceptor to add the token to requests
+apiClient.interceptors.request.use(async (config) => {
+  let token: string | null = null
+
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token")
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // 1. Try localStorage
+    token = localStorage.getItem("token")
+    
+    // 2. Try session if no localStorage token
+    if (!token) {
+      const session = await getSession()
+      if (session && "accessToken" in session) {
+        token = session.accessToken as string
+      }
     }
+  }
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })

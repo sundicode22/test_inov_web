@@ -48,6 +48,8 @@ export interface CreateEventRequest {
   notes?: string
 }
 
+export type UpdateEventRequest = CreateEventRequest
+
 export interface ListEventsParams {
   date?: string
   range?: 'week'

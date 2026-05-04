@@ -16,10 +16,12 @@ export default function DashboardLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
+      <AppSidebar />
+      <SidebarInset className="min-h-0 overflow-hidden">
         <SiteHeader />
-        <div className="flex flex-1 flex-col bg-background">{children}</div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

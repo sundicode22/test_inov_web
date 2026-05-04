@@ -1,39 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { signIn } from "next-auth/react"
-import { 
-  Mail01Icon, 
-  LockPasswordIcon, 
-  ViewIcon, 
-  ViewOffSlashIcon,
-  GoogleIcon,
-} from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Logo } from "@/components/logo"
-import { FieldError, FieldLabel } from "@/components/ui/field"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import Link from "next/link";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const loginSchema = z.object({
-  email: z.string().email("Adresse e-mail invalide"),
-  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  rememberMe: z.boolean(),
-})
+  email: z.string().email("Veuillez entrer une adresse e-mail valide"),
+  password: z
+    .string()
+    .min(6, "Le mot de passe doit faire au moins 6 caractères"),
+});
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -42,171 +42,214 @@ export function LoginForm({
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "jean.kamga@inov-consulting.com",
-      rememberMe: true,
+      email: "",
+      password: "",
     },
-  })
+  });
 
-  async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true)
+  async function onSubmit(values: LoginFormValues) {
+    setIsLoading(true);
     try {
-      await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        callbackUrl: "/dashboard",
-      })
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.status === 200) {
+        toast.success("Connexion réussie");
+        router.push("/dashboard");
+        router.refresh();
+      } else {
+        toast.error("Identifiants invalides");
+      }
     } catch (error) {
-      console.error(error)
+      toast.error("Une erreur est survenue");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className={cn("grid min-h-[600px] w-full max-w-[1000px] overflow-hidden rounded-[2rem] bg-white shadow-2xl md:grid-cols-[420px_1fr]", className)} {...props}>
-      {/* Sidebar Gradient */}
-      <div className="relative hidden flex-col justify-between bg-login-gradient p-10 text-white md:flex">
-        <div className="space-y-12">
-          <Logo />
-          
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-medium tracking-wider text-cyan-400">
-              <div className="size-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              POWERED BY AI • V2.4
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="overflow-hidden p-0 border-none">
+        <CardContent className="grid p-0 md:grid-cols-2">
+          {/* Brand panel (left only — form column unchanged) */}
+          <div className="relative hidden min-h-[700px] w-full overflow-hidden bg-gradient-to-b from-[#0c1929] via-[#081420] to-[#030a12] md:flex md:min-h-full md:flex-col md:justify-between">
+            <div
+              className="pointer-events-none absolute right-0 -top-20 h-[320px] w-[320px] rounded-full bg-primary/50 blur-[100px]"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute bottom-0 left-1/2 h-[240px] w-[120%] -translate-x-1/2 translate-y-1/3 bg-cyan-900/80 blur-[80px]"
+              aria-hidden
+            />
+
+            <div className="relative z-10 flex flex-1 flex-col gap-10 p-8 lg:p-10">
+              <div className="flex mb-10">
+                <Logo />=
+              </div>
+
+              <div className="max-w-lg space-y-5">
+                <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-400">
+                  <span
+                    className="size-1.5 shrink-0 rounded-full bg-teal-400,40 shadow-[0_0_8px_rgba(45,212,191,0.6)]"
+                    aria-hidden
+                  />
+                  Powered by AI · V2.4
+                </p>
+                <h2 className="text-balance text-xl font-bold leading-[1.15] tracking-tight text-white lg:text-2xl">
+                  Votre assistant intelligent pour diriger{" "}
+                  <span className="text-cyan-400/80">sans friction</span>
+                </h2>
+                <p className="text-pretty text-xs leading-relaxed text-slate-400">
+                  Gestion d&apos;agenda, échanges conversationnels et
+                  intelligence métier — réunis dans une seule interface conçue
+                  pour les décideurs.
+                </p>
+              </div>
             </div>
-            
-            <div className="space-y-4">
-              <h1 className="text-4xl font-bold leading-[1.1] tracking-tight">
-                Votre assistant intelligent pour <span className="text-white">diriger</span> <span className="text-sky-400">sans friction</span>
-              </h1>
-              <p className="text-sm leading-relaxed text-white/60 max-w-[320px]">
-                Gestion d&apos;agenda, échanges conversationnels et intelligence métier — réunis dans une seule interface conçue pour les décideurs.
-              </p>
+
+            <div className="relative z-10 border-t border-white/10 px-8 pb-8 pt-6 lg:px-10">
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <p className="text-2xl font-bold tabular-nums text-white lg:text-3xl">
+                    2.4k+
+                  </p>
+                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Managers actifs
+                  </p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold tabular-nums text-white lg:text-3xl">
+                    180k
+                  </p>
+                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Conversations
+                  </p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold tabular-nums text-white lg:text-3xl">
+                    99.9%
+                  </p>
+                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Disponibilité
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
-          <div>
-            <div className="text-lg font-bold">2.4k+</div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40">Managers actifs</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold">180k</div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40">Conversations</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold">99.9%</div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40">Disponibilité</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Form Area */}
-      <div className="flex flex-col items-center justify-center p-8 md:p-16">
-        <div className="w-full max-w-[400px] space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Connexion</h2>
-            <p className="text-sm text-slate-500">
-              Entrez vos identifiants pour accéder à votre espace.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <FieldLabel htmlFor="email" className="text-sm font-bold text-slate-900">
-                  Adresse e-mail
-                </FieldLabel>
-                <div className="relative">
-                  <HugeiconsIcon icon={Mail01Icon} className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="p-6 md:p-10 bg-white"
+          >
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <h1 className="text-2xl text-black font-bold">Connexion</h1>
+                <p className="text-balance text-sm text-muted-foreground">
+                  Entrez vos identifiants pour accéder à votre espace.{" "}
+                </p>
+              </div>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Adresse e-mail</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="jean.kamga@inov-consulting.com"
-                    className="h-12 border-none bg-slate-100 pl-11 shadow-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    placeholder="nom@exemple.com"
                     {...register("email")}
+                    disabled={isLoading}
+                    className="h-11"
                   />
+                  {errors.email && (
+                    <p className="text-xs text-destructive font-medium">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
-                <FieldError errors={[errors.email]} />
-              </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Mot de passe</Label>
+                    <Link
+                      href="#"
+                      className="ml-auto text-xs underline-offset-4 hover:underline font-medium text-primary"
+                    >
+                      Mot de passe oublié ?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      {...register("password")}
+                      disabled={isLoading}
+                      className="h-11 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FieldLabel htmlFor="password" className="text-sm font-bold text-slate-900">
-                    Mot de passe
-                  </FieldLabel>
-                  <a href="#" className="text-xs font-semibold text-blue-600 hover:underline">
-                    Mot de passe oublié ?
-                  </a>
+                    {errors.password && (
+                      <p className="text-xs text-destructive font-medium mt-1">
+                        {errors.password.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="relative">
-                  <HugeiconsIcon icon={LockPasswordIcon} className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••••••"
-                    className="h-12 border-none bg-slate-100 pl-11 pr-11 shadow-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500/20"
-                    {...register("password")}
-                  />
-                  <button 
-                    type="button" 
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <HugeiconsIcon icon={showPassword ? ViewOffSlashIcon : ViewIcon} className="size-4" />
-                  </button>
-                </div>
-                <FieldError errors={[errors.password]} />
+                <Button
+                  type="submit"
+                  className="w-full h-11 text-sm font-bold bg-black hover:bg-black/90 flex items-center gap-2"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Connexion..." : "Se connecter"}{" "}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
+              <div className="relative text-center text-xs after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                <span className="relative z-10 bg-white px-2 text-muted-foreground uppercase tracking-wider font-bold">
+                  Ou continuez avec
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="h-11 border-border/60 hover:bg-muted/50"
+                >
+                  <FcGoogle className="mr-2 h-5 w-5" />
+                  <span className="text-xs font-bold">Google</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="h-11 border-border/60 hover:bg-muted/50"
+                >
+                  <FaGithub className="mr-2 h-5 w-5" />
+                  <span className="text-xs font-bold">GitHub</span>
+                </Button>
+              </div>
+              <div className="text-center text-xs text-muted-foreground">
+                Pas encore de compte ?{" "}
+                <a
+                  href="#"
+                  className="underline underline-offset-4 hover:text-primary font-bold"
+                >
+                  Demander un accès
+                </a>
               </div>
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="size-4 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" {...register("rememberMe")} />
-              <label htmlFor="remember" className="text-xs font-medium text-slate-600 leading-none">
-                Se souvenir de moi pendant 30 jours
-              </label>
-            </div>
-
-            <Button type="submit" disabled={isLoading} className="h-12 w-full rounded-xl bg-slate-950 text-sm font-semibold hover:bg-slate-900">
-              {isLoading ? "Connexion..." : "Se connecter"}
-              {!isLoading && <span className="ml-2">{"\u2192"}</span>}
-            </Button>
           </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-100" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-slate-400">
-              <span className="bg-white px-4">Ou continuez avec</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="h-12 rounded-xl border-slate-200 hover:bg-slate-50">
-              <HugeiconsIcon icon={GoogleIcon} className="mr-2 size-4 text-[#EA4335]" />
-              <span className="text-xs font-semibold text-slate-700">Google</span>
-            </Button>
-            <Button variant="outline" className="h-12 rounded-xl border-slate-200 hover:bg-slate-50">
-              <div className="mr-2 grid grid-cols-2 gap-0.5">
-                <div className="size-1.5 bg-[#F25022]" />
-                <div className="size-1.5 bg-[#7FBA00]" />
-                <div className="size-1.5 bg-[#00A4EF]" />
-                <div className="size-1.5 bg-[#FFB900]" />
-              </div>
-              <span className="text-xs font-semibold text-slate-700">Microsoft 365</span>
-            </Button>
-          </div>
-
-          <p className="text-center text-xs text-slate-500">
-            Pas encore de compte ?{" "}
-            <a href="#" className="font-semibold text-blue-600 hover:underline">
-              Demander un accès
-            </a>
-          </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }

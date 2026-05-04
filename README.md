@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# INOV Consulting — Web app
 
-## Getting Started
+Next.js dashboard (authentification, profil, conversations, calendrier, etc.) branchée sur l’API backend INOV.
 
-First, run the development server:
+## Prérequis
+
+- **Node.js** 20 ou supérieur (recommandé pour Next.js 16)
+- **npm**, **pnpm**, **yarn**, ou **bun** (le dépôt contient `package-lock.json` et `bun.lock`)
+
+## Démarrage rapide
+
+### 1. Installer les dépendances
+
+Depuis la racine du projet :
+
+```bash
+npm install
+```
+
+Ou avec Bun :
+
+```bash
+bun install
+```
+
+### 2. Variables d’environnement
+
+L’application utilise **NextAuth** avec une stratégie JWT. Vous devez définir un secret :
+
+1. Copiez le fichier d’exemple :
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Éditez `.env.local` et renseignez **`AUTH_SECRET`** avec une chaîne aléatoire longue (par exemple générée via `openssl rand -base64 32`).
+
+Sans `AUTH_SECRET`, la connexion et les sessions peuvent échouer.
+
+### 3. Lancer le serveur de développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Puis ouvrez [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+La page de connexion est sur [http://localhost:3000/login](http://localhost:3000/login) (voir `auth.ts` pour la configuration NextAuth).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Build et production en local
 
-## Learn More
+```bash
+npm run build
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+Le serveur de production écoute par défaut sur le port **3000**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts npm
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Script      | Description                          |
+| ----------- | ------------------------------------ |
+| `npm run dev`   | Serveur de développement (hot reload) |
+| `npm run build` | Build de production Next.js          |
+| `npm run start` | Lance le build après `build`         |
+| `npm run lint`  | ESLint                                 |
 
-## Deploy on Vercel
+## API backend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+L’URL de base de l’API est définie dans `lib/api-client.ts` (`API_BASE_URL`). Adaptez-la si vous pointez vers un autre environnement.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Plus d’infos
+
+- [Documentation Next.js](https://nextjs.org/docs)
+- [NextAuth.js](https://next-auth.js.org/)

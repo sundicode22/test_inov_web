@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils"
 
 export function LogoIcon({ className }: { className?: string }) {
   return (
-    <div className={cn("relative flex size-10 items-center justify-center rounded-xl bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.5)]", className)}>
-      <div className="size-6 rounded-full border-[3px] border-white/90" />
-      <div className="absolute bottom-2 right-2 size-2.5 bg-cyan-400 rounded-sm" />
+    <div className={cn("relative flex size-10 items-center justify-center rounded-xl bg-[#0066FF] shadow-[0_0_25px_rgba(0,102,255,0.5),0_0_50px_rgba(0,102,255,0.2)]", className)}>
+      <div className="size-6 rounded-full border-[3px] border-white" />
+      <div className="absolute bottom-[7px] right-[7px] size-[10px] rounded-[2px] bg-[#00F0FF] border-[2px] border-[#0066FF]" />
     </div>
   )
 }

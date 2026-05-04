@@ -55,8 +55,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #0066ff;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -90,7 +90,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: #0066ff;
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -119,7 +119,52 @@
 
 @layer utilities {
   .bg-login-gradient {
-    background: radial-gradient(circle at 20% 20%, #0066ff 0%, #001a4d 50%, #000000 100%);
+    background: radial-gradient(
+      circle at 20% 20%,
+      #0066ff 0%,
+      #001a4d 50%,
+      #000000 100%
+    );
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+  }
+
+  /* Chat message list: visible scrollbar (Firefox + WebKit) */
+  .chat-messages-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .chat-messages-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .chat-messages-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-messages-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+
+  .chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 }
 

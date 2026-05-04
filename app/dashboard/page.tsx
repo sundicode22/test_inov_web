@@ -2,34 +2,36 @@
 
 import { useDashboardStats } from "@/hooks/use-dashboard-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Analytics01Icon,
-  UserGroupIcon,
-  File01Icon,
-} from "@hugeicons/core-free-icons"
+import { BarChart3, Users, FileText } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 export default function DashboardPage() {
   const { data, isLoading } = useDashboardStats()
+  const { data: session } = useSession()
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto">
         <p>Chargement des statistiques...</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 lg:gap-6 lg:p-6">
+      <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Tableau de bord</h1>
+        {session?.user && (
+          <div className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border">
+            Connecté en tant que <span className="font-bold text-foreground">{session.user.email}</span>
+          </div>
+        )}
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Productivité</CardTitle>
-            <HugeiconsIcon icon={Analytics01Icon} className="size-4 text-muted-foreground" />
+            <BarChart3 className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data?.productivity}%</div>
@@ -39,7 +41,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Réunions</CardTitle>
-            <HugeiconsIcon icon={UserGroupIcon} className="size-4 text-muted-foreground" />
+            <Users className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data?.reunions} total</div>
@@ -49,7 +51,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Documents</CardTitle>
-            <HugeiconsIcon icon={File01Icon} className="size-4 text-muted-foreground" />
+            <FileText className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data?.documents}</div>

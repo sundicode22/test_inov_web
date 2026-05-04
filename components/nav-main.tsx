@@ -42,7 +42,7 @@ export function NavMain({
                 </Link>
               </SidebarMenuButton>
               {item.badge && (
-                <SidebarMenuBadge className="bg-primary/10 text-primary group-data-[collapsible=icon]/sidebar-wrapper:hidden">
+                <SidebarMenuBadge className="group-data-[collapsible=icon]/sidebar-wrapper:hidden">
                   {item.badge}
                 </SidebarMenuBadge>
               )}

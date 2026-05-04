@@ -14,83 +14,84 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  DashboardSquare01Icon,
-  Menu01Icon,
-  ChartHistogramIcon,
-  Folder01Icon,
-  UserGroupIcon,
-  Settings05Icon,
-  HelpCircleIcon,
-  CommandIcon,
-} from "@hugeicons/core-free-icons";
+  LayoutDashboard,
+  MessageCircle,
+  Calendar,
+  FileText,
+  User,
+  Settings,
+  HelpCircle,
+  Search,
+} from "lucide-react";
 
 const data = {
-  user: {
-    name: "Jean Kamga",
-    email: "jean.kamga@inov-consulting.com",
-    avatar: "/avatars/jean.jpg",
-  },
   navMain: [
     {
       title: "Tableau de bord",
       url: "/dashboard",
-      icon: <HugeiconsIcon icon={DashboardSquare01Icon} strokeWidth={2} />,
+      icon: <LayoutDashboard className="size-4" />,
     },
     {
       title: "Conversations",
       url: "/dashboard/conversations",
-      icon: <HugeiconsIcon icon={Menu01Icon} strokeWidth={2} />,
+      icon: <MessageCircle className="size-4" />,
       badge: "12",
     },
     {
       title: "Calendrier",
       url: "/dashboard/calendrier",
-      icon: <HugeiconsIcon icon={ChartHistogramIcon} strokeWidth={2} />,
+      icon: <Calendar className="size-4" />,
     },
     {
       title: "Documents",
       url: "/dashboard/documents",
-      icon: <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />,
+      icon: <FileText className="size-4" />,
     },
   ],
   navSecondary: [
     {
       title: "Mon profil",
       url: "/dashboard/profil",
-      icon: <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />,
+      icon: <User className="size-4" />,
     },
     {
       title: "Paramètres",
       url: "/dashboard/parametres",
-      icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
+      icon: <Settings className="size-4" />,
     },
     {
       title: "Aide & support",
       url: "/dashboard/aide",
-      icon: <HugeiconsIcon icon={HelpCircleIcon} strokeWidth={2} />,
+      icon: <HelpCircle className="size-4" />,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              size="lg"
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5 hover:bg-transparent active:bg-transparent"
             >
-              <a href="#">
-                <HugeiconsIcon
-                  icon={CommandIcon}
-                  strokeWidth={2}
-                  className="size-5!"
-                />
-                <span className="text-base font-semibold">Acme Inc.</span>
+              <a href="/dashboard" className="flex items-center gap-3">
+                <div className="relative flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-blue-900 shadow-lg">
+                  <Search className="size-6 text-white" strokeWidth={2.5} />
+                  <div className="absolute bottom-2 right-2 size-2 rounded-[1px] bg-cyan-400" />
+                </div>
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="text-lg font-semibold text-black tracking-tight">
+                    Inov
+                  </span>
+                  <span className="text-[10px]  text-gray-400 uppercase tracking-[0.2em]">
+                    AI Assistant
+                  </span>
+                </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -98,10 +99,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary items={data.navSecondary} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
