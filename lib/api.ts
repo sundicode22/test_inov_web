@@ -6,7 +6,8 @@ import {
   ChatResponse, 
   AgendaEvent, 
   CreateEventRequest, 
-  ListEventsParams 
+  ListEventsParams,
+  UserMe
 } from "@/types/api"
 
 export const api = {
@@ -25,5 +26,9 @@ export const api = {
       apiClient.get<AgendaEvent[]>("/agenda", { params }).then(res => res.data),
     create: (data: CreateEventRequest) => 
       apiClient.post<AgendaEvent>("/agenda", data).then(res => res.data),
+  },
+  user: {
+    me: () => 
+      apiClient.get<UserMe>("/user/me").then(res => res.data),
   },
 }

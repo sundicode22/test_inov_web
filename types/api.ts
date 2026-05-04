@@ -14,7 +14,7 @@ export interface LoginResponse {
 export interface AgentTool {
   name: string
   description: string
-  args_schema: any
+  args_schema: Record<string, unknown>
 }
 
 export interface ChatRequest {
@@ -51,4 +51,14 @@ export interface CreateEventRequest {
 export interface ListEventsParams {
   date?: string
   range?: 'week'
+}
+
+export interface UserMe {
+  id: string
+  email: string
+  role: string
+  nom: string
+  prenom: string
+  adresse: string
+  created_at: string
 }

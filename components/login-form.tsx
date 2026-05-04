@@ -1,28 +1,24 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { signIn } from "next-auth/react"
+import { 
+  Mail01Icon, 
+  LockPasswordIcon, 
+  ViewIcon, 
+  ViewOffSlashIcon,
+  GoogleIcon,
+} from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldError,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
 import { Logo } from "@/components/logo"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { 
-  ArrowRight01Icon, 
-  Mail01Icon, 
-  ViewIcon,
-  LockPasswordIcon
-} from "@hugeicons/core-free-icons"
+import { FieldError, FieldLabel } from "@/components/ui/field"
 
 const loginSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
@@ -35,189 +31,182 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentPropsWithoutRef<"div">) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "jean.kamga@inov-consulting.com",
-      password: "",
-      rememberMe: false,
+      rememberMe: true,
     },
   })
 
-  const onSubmit = async (data: LoginFormValues) => {
+  async function onSubmit(data: LoginFormValues) {
+    setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Form submitted:", data)
-      toast.success("Connexion réussie !")
-    } catch {
-      toast.error("Échec de la connexion. Veuillez réessayer.")
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        callbackUrl: "/dashboard",
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="max-w-[1000px] overflow-hidden rounded-3xl border-none shadow-2xl">
-        <CardContent className="grid p-0 md:grid-cols-[45%_55%]">
-          {/* Left Side: Gradient Panel */}
-          <div className="bg-login-gradient relative flex flex-col justify-between p-10 text-white">
-            <div className="space-y-12">
-              <Logo />
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="size-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-[10px] font-bold tracking-widest text-white/60 uppercase">
-                    Powered by AI • V2.4
-                  </span>
+    <div className={cn("grid min-h-[600px] w-full max-w-[1000px] overflow-hidden rounded-[2rem] bg-white shadow-2xl md:grid-cols-[420px_1fr]", className)} {...props}>
+      {/* Sidebar Gradient */}
+      <div className="relative hidden flex-col justify-between bg-login-gradient p-10 text-white md:flex">
+        <div className="space-y-12">
+          <Logo />
+          
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-medium tracking-wider text-cyan-400">
+              <div className="size-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              POWERED BY AI • V2.4
+            </div>
+            
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold leading-[1.1] tracking-tight">
+                Votre assistant intelligent pour <span className="text-white">diriger</span> <span className="text-sky-400">sans friction</span>
+              </h1>
+              <p className="text-sm leading-relaxed text-white/60 max-w-[320px]">
+                Gestion d&apos;agenda, échanges conversationnels et intelligence métier — réunis dans une seule interface conçue pour les décideurs.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
+          <div>
+            <div className="text-lg font-bold">2.4k+</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/40">Managers actifs</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold">180k</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/40">Conversations</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold">99.9%</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/40">Disponibilité</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Form Area */}
+      <div className="flex flex-col items-center justify-center p-8 md:p-16">
+        <div className="w-full max-w-[400px] space-y-8">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Connexion</h2>
+            <p className="text-sm text-slate-500">
+              Entrez vos identifiants pour accéder à votre espace.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <FieldLabel htmlFor="email" className="text-sm font-bold text-slate-900">
+                  Adresse e-mail
+                </FieldLabel>
+                <div className="relative">
+                  <HugeiconsIcon icon={Mail01Icon} className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="jean.kamga@inov-consulting.com"
+                    className="h-12 border-none bg-slate-100 pl-11 shadow-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    {...register("email")}
+                  />
                 </div>
-                <h1 className="text-4xl font-bold leading-tight">
-                  Votre assistant intelligent pour diriger <span className="text-white/60 italic">sans friction</span>
-                </h1>
-                <p className="text-sm leading-relaxed text-white/60 max-w-[300px]">
-                  Gestion d&apos;agenda, échanges conversationnels et intelligence métier — réunis dans une seule interface conçue pour les décideurs.
-                </p>
+                <FieldError errors={[errors.email]} />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <FieldLabel htmlFor="password" className="text-sm font-bold text-slate-900">
+                    Mot de passe
+                  </FieldLabel>
+                  <a href="#" className="text-xs font-semibold text-blue-600 hover:underline">
+                    Mot de passe oublié ?
+                  </a>
+                </div>
+                <div className="relative">
+                  <HugeiconsIcon icon={LockPasswordIcon} className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••••••"
+                    className="h-12 border-none bg-slate-100 pl-11 pr-11 shadow-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    {...register("password")}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <HugeiconsIcon icon={showPassword ? ViewOffSlashIcon : ViewIcon} className="size-4" />
+                  </button>
+                </div>
+                <FieldError errors={[errors.password]} />
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-12 border-t border-white/10">
-              <div>
-                <div className="text-xl font-bold">2.4k+</div>
-                <div className="text-[9px] font-medium text-white/40 uppercase tracking-tighter">Managers actifs</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold">180k</div>
-                <div className="text-[9px] font-medium text-white/40 uppercase tracking-tighter">Conversations</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold">99.9%</div>
-                <div className="text-[9px] font-medium text-white/40 uppercase tracking-tighter">Disponibilité</div>
-              </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="remember" className="size-4 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" {...register("rememberMe")} />
+              <label htmlFor="remember" className="text-xs font-medium text-slate-600 leading-none">
+                Se souvenir de moi pendant 30 jours
+              </label>
+            </div>
+
+            <Button type="submit" disabled={isLoading} className="h-12 w-full rounded-xl bg-slate-950 text-sm font-semibold hover:bg-slate-900">
+              {isLoading ? "Connexion..." : "Se connecter"}
+              {!isLoading && <span className="ml-2">{"\u2192"}</span>}
+            </Button>
+          </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-slate-100" />
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-slate-400">
+              <span className="bg-white px-4">Ou continuez avec</span>
             </div>
           </div>
 
-          {/* Right Side: Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12 bg-white dark:bg-zinc-950">
-            <FieldGroup className="gap-6">
-              <div className="space-y-1">
-                <h2 className="text-3xl font-bold tracking-tight">Connexion</h2>
-                <p className="text-sm text-muted-foreground">
-                  Entrez vos identifiants pour accéder à votre espace.
-                </p>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" className="h-12 rounded-xl border-slate-200 hover:bg-slate-50">
+              <HugeiconsIcon icon={GoogleIcon} className="mr-2 size-4 text-[#EA4335]" />
+              <span className="text-xs font-semibold text-slate-700">Google</span>
+            </Button>
+            <Button variant="outline" className="h-12 rounded-xl border-slate-200 hover:bg-slate-50">
+              <div className="mr-2 grid grid-cols-2 gap-0.5">
+                <div className="size-1.5 bg-[#F25022]" />
+                <div className="size-1.5 bg-[#7FBA00]" />
+                <div className="size-1.5 bg-[#00A4EF]" />
+                <div className="size-1.5 bg-[#FFB900]" />
               </div>
+              <span className="text-xs font-semibold text-slate-700">Microsoft 365</span>
+            </Button>
+          </div>
 
-              <div className="space-y-4">
-                <Field>
-                  <FieldLabel htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-                    Adresse e-mail
-                  </FieldLabel>
-                  <div className="relative">
-                    <HugeiconsIcon icon={Mail01Icon} className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      className="h-12 border-muted/30 bg-muted/20 pl-10 focus:bg-white"
-                      {...register("email")}
-                    />
-                  </div>
-                  <FieldError errors={[errors.email]} />
-                </Field>
-
-                <Field>
-                  <div className="flex items-center justify-between">
-                    <FieldLabel htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-                      Mot de passe
-                    </FieldLabel>
-                    <a href="#" className="text-xs font-medium text-blue-600 hover:underline">
-                      Mot de passe oublié ?
-                    </a>
-                  </div>
-                  <div className="relative">
-                    <HugeiconsIcon icon={LockPasswordIcon} className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      className="h-12 border-muted/30 bg-muted/20 pl-10 pr-10 focus:bg-white"
-                      {...register("password")}
-                    />
-                    <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <HugeiconsIcon icon={ViewIcon} className="size-4 text-muted-foreground" />
-                    </button>
-                  </div>
-                  <FieldError errors={[errors.password]} />
-                </Field>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" {...register("rememberMe")} />
-                  <label htmlFor="remember" className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Se souvenir de moi pendant 30 jours
-                  </label>
-                </div>
-              </div>
-
-              <Button type="submit" disabled={isSubmitting} className="h-12 w-full bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl shadow-lg shadow-zinc-200">
-                {isSubmitting ? "Connexion..." : (
-                  <span className="flex items-center gap-2">
-                    Se connecter <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} className="size-4" />
-                  </span>
-                )}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase">
-                  <span className="bg-white dark:bg-zinc-950 px-2 text-muted-foreground font-medium tracking-widest">
-                    Ou continuez avec
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" type="button" className="h-11 rounded-xl border-muted/30">
-                  <svg className="mr-2 size-4" viewBox="0 0 24 24">
-                    <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  Google
-                </Button>
-                <Button variant="outline" type="button" className="h-11 rounded-xl border-muted/30">
-                  <svg className="mr-2 size-4 text-[#00a1f1]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z" />
-                  </svg>
-                  Microsoft 365
-                </Button>
-              </div>
-
-              <div className="text-center text-xs text-muted-foreground">
-                Pas encore de compte ?{" "}
-                <a href="#" className="font-semibold text-blue-600 hover:underline">
-                  Demander un accès
-                </a>
-              </div>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+          <p className="text-center text-xs text-slate-500">
+            Pas encore de compte ?{" "}
+            <a href="#" className="font-semibold text-blue-600 hover:underline">
+              Demander un accès
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
