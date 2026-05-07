@@ -56,7 +56,7 @@ export function LoginForm({
         redirect: false,
       });
 
-      if (result?.status === 200) {
+      if (result?.ok && !result.error) {
         toast.success("Connexion réussie");
         router.push("/dashboard");
         router.refresh();
